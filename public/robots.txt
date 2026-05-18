@@ -1,0 +1,13 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow private or temporary pages
+Disallow: /admin
+Disallow: /api
+
+# Sitemap location
+Sitemap: https://technest.vercel.app/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

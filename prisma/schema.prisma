@@ -1,0 +1,299 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Authentication & Customer Management
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String?
+  phone     String?
+  role      UserRole   @default("customer")
+  address   String?
+  city      String?
+  zipCode   String?
+  
+  // Relations
+  cart      Cart?
+  orders    Order[]
+  addresses ShippingAddress[]
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  customer
+  admin
+}
+
+// Product Model - Core Product Data
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  sku         String   @unique
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  price       Float    // Current price
+  originalPrice Float? // Original price for discounts
+  
+  brand       String?
+  images      String[] // Store URLs as JSON array
+  specifications Json?  // Store as JSON for flexibility
+  
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  
+  // Relations
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  inventory   Inventory?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([slug])
+  @@map("products")
+}
+
+// Category Model - Product Organization
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  
+  products Product[]
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+// Inventory Model - Stock Management
+model Inventory {
+  id          String  @id @default(cuid())
+  productId   String  @unique
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity    Int     @default(0)
+  reserved    Int     @default(0) // Reserved for pending orders
+  sold        Int     @default(0)  // Total sold
+  
+  lastUpdated DateTime @default(now()) @updatedAt
+  
+  @@map("inventory")
+}
+
+// Cart Model - Shopping Cart
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  items     CartItem[]
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+// CartItem Model - Individual Cart Items
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity  Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+// Order Model - Order Management
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  orderNumber   String      @unique // Custom order number for customer communication
+  status        OrderStatus @default("pending")
+  paymentStatus PaymentStatus @default("unpaid")
+  paymentMethod PaymentMethod
+  
+  subtotal      Float
+  tax           Float
+  shippingCost  Float       @default(0)
+  totalAmount   Float
+  
+  shippingAddress String    // Store as JSON
+  billingAddress  String?   // Store as JSON
+  
+  items         OrderItem[]
+  payment       Payment?
+  
+  notes         String?
+  trackingId    String?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([userId])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  processing
+  shipped
+  delivered
+  cancelled
+  refunded
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
+  failed
+  refunded
+}
+
+enum PaymentMethod {
+  cod           // Cash on Delivery
+  jazzcash      // JazzCash Mobile Money
+  easypaisa     // EasyPaisa Mobile Money
+  card          // Debit/Credit Cards
+}
+
+// OrderItem Model - Individual Order Items
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  
+  quantity  Int
+  price     Float   // Price at time of purchase
+  total     Float   // quantity * price
+  
+  @@map("order_items")
+}
+
+// Payment Model - Payment Tracking (Pakistan-Specific)
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  amount        Float
+  currency      String        @default("PKR")
+  method        PaymentMethod
+  status        PaymentStatus @default("unpaid")
+  
+  // Payment gateway specific
+  gatewayId     String?       // Transaction ID from PayFast/Stripe etc
+  reference     String?       // Customer reference number
+  
+  attempt       Int           @default(1)
+  lastAttempt   DateTime      @default(now())
+  
+  // For COD
+  isCollected   Boolean       @default(false)
+  collectedAt   DateTime?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@index([gatewayId])
+  @@map("payments")
+}
+
+// Shipping Address Model - Multiple Addresses
+model ShippingAddress {
+  id       String  @id @default(cuid())
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name     String
+  phone    String
+  email    String
+  address  String
+  city     String
+  zipCode  String
+  isDefault Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("shipping_addresses")
+}
+
+// Session Model - NextAuth Sessions
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

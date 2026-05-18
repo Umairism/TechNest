@@ -1,0 +1,21 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm ci",
+  "framework": "nextjs",
+  "crons": [],
+  "regions": ["iad1"],
+  "public": true,
+  "env": [
+    {
+      "key": "NEXT_PUBLIC_SITE_URL",
+      "value": "https://technest.vercel.app",
+      "type": "plaintext"
+    },
+    {
+      "key": "NEXT_PUBLIC_API_URL",
+      "value": "https://technest.vercel.app/api",
+      "type": "plaintext"
+    }
+  ]
+}
