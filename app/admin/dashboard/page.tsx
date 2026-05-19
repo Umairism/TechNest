@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/admin/stat-card";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
   const [products, pendingProducts, users, orders, openOrders, revenue, lowStock, alerts] =
     await Promise.all([
