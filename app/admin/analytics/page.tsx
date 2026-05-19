@@ -1,4 +1,6 @@
 import { BarChart3, DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-react";
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/admin/stat-card";

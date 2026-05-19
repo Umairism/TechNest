@@ -1,4 +1,6 @@
 import { revalidatePath } from "next/cache";
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { Card } from "@/components/ui/card";

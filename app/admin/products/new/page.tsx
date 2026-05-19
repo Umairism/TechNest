@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+export const dynamic = 'force-dynamic';
+
 async function createProduct(formData: FormData) {
   "use server";
   const session = await auth();
