@@ -13,11 +13,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
-  // Disable prerendering for pages with dynamic routes and database access
-  experimental: {
-    // Skip prerendering errors for dynamic pages
-    isrMemoryCacheSize: 0,
-  },
 }
 
 export default nextConfig

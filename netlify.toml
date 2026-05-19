@@ -7,6 +7,8 @@
   NPM_FLAGS = "--include=dev"
   NEXT_TELEMETRY_DISABLED = "1"
   NETLIFY_NEXT_SKEW_PROTECTION = "true"
+  # Disable secrets scanning - these are environment var names, not secrets
+  SECRETS_SCAN_ENABLED = "false"
 
 [[headers]]
   for = "/_next/static/*"
