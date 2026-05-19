@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       data = await InventoryService.getOutOfStockProducts();
     } else {
       // Get all inventory
-      data = await InventoryService.getLowStockProducts(); // Simplified for demo
+      data = await InventoryService.getAllProducts();
     }
 
     return NextResponse.json({

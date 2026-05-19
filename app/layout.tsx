@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://technest.vercel.app",
+    url: "https://techenest.netlify.app",
     siteName: "TechNest",
     title: "TechNest - Premium PC Components",
     description: "High-quality computer components and gaming hardware",
     images: [
       {
-        url: "https://technest.vercel.app/og-image.jpg",
+        url: "https://techenest.netlify.app/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "TechNest - Premium PC Components",
@@ -45,12 +45,7 @@ export const metadata: Metadata = {
     creator: "@technest",
     title: "TechNest - Premium PC Components",
     description: "High-quality computer components and gaming hardware",
-    images: ["https://technest.vercel.app/og-image.jpg"],
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
+    images: ["https://techenest.netlify.app/og-image.jpg"],
   },
   icons: {
     icon: [
@@ -74,14 +69,20 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark bg-background">
-      <body className="font-sans antialiased bg-background text-foreground">
+    <html lang="en" className="dark bg-background" suppressHydrationWarning>
+      <body className="font-sans antialiased bg-background text-foreground" suppressHydrationWarning>
         <AuthProvider>
           <CartProvider>{children}</CartProvider>
         </AuthProvider>

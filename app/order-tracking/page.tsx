@@ -8,48 +8,21 @@ export default function OrderTrackingPage() {
   const [orderId, setOrderId] = useState("");
   const [trackingData, setTrackingData] = useState<any>(null);
 
-  const handleTrack = (e: React.FormEvent) => {
+  const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     if (orderId) {
-      // Mock tracking data
-      setTrackingData({
-        orderId: orderId,
-        status: "In Transit",
-        estimatedDelivery: "May 25, 2026",
-        currentLocation: "San Francisco Distribution Center",
-        stages: [
-          {
-            name: "Order Confirmed",
-            date: "May 18, 2026",
-            completed: true,
-            icon: CheckCircle,
-          },
-          {
-            name: "Processing",
-            date: "May 19, 2026",
-            completed: true,
-            icon: Clock,
-          },
-          {
-            name: "Shipped",
-            date: "May 20, 2026",
-            completed: true,
-            icon: Package,
-          },
-          {
-            name: "In Transit",
-            date: "May 21-25, 2026",
-            completed: false,
-            icon: Truck,
-          },
-          {
-            name: "Delivered",
-            date: "May 25, 2026",
-            completed: false,
-            icon: MapPin,
-          },
-        ],
-      });
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        if (!response.ok) {
+          alert("Order not found");
+          return;
+        }
+        const data = await response.json();
+        setTrackingData(data.data);
+      } catch (error) {
+        console.error("Error fetching order:", error);
+        alert("Failed to fetch order details");
+      }
     }
   };
 

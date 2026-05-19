@@ -213,7 +213,7 @@ export const logAPI = (
   duration: number
 ): void => {
   const timestamp = new Date().toISOString();
-  const statusEmoji = status >= 200 && status < 300 ? "✅" : "❌";
+  const statusEmoji = status >= 200 && status < 300 ? "[OK]" : "[ERR]";
   console.log(
     `${statusEmoji} [${timestamp}] ${method} ${endpoint} - ${status} (${duration}ms)`
   );

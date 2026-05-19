@@ -18,7 +18,7 @@ export function Hero() {
           <div className="space-y-6 animate-fade-in-up">
             <div className="inline-block">
               <span className="text-accent text-sm font-semibold px-4 py-2 bg-accent/10 rounded-full">
-                ✨ Welcome to TechNest
+                Welcome to TechNest
               </span>
             </div>
 
@@ -75,7 +75,7 @@ export function Hero() {
 
               {/* Content */}
               <div className="relative z-10 text-center">
-                <div className="text-7xl mb-4">💻</div>
+                <div className="text-7xl mb-4">[PC]</div>
                 <div className="text-sm text-muted-foreground">High-Performance</div>
                 <div className="text-sm text-muted-foreground">Components</div>
               </div>

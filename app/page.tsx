@@ -51,17 +51,17 @@ export default function Home() {
               {
                 title: "Fast Shipping",
                 description: "Free shipping on orders over $100",
-                icon: "🚚",
+                icon: "�",
               },
               {
                 title: "Secure Checkout",
                 description: "256-bit SSL encryption for your protection",
-                icon: "🔒",
+                icon: "✓",
               },
               {
                 title: "Expert Support",
                 description: "24/7 customer support and technical assistance",
-                icon: "💬",
+                icon: "?",
               },
             ].map((feature) => (
               <div

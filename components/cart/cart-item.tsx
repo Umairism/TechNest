@@ -31,7 +31,7 @@ function CartItemComponent({ item, onRemove, onUpdateQuantity }: CartItemProps) 
     <div className="flex gap-4 p-4 bg-card border border-border rounded-lg hover:border-accent/50 transition">
       {/* Product Image */}
       <div className="w-24 h-24 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-3xl">📦</span>
+        <span className="text-3xl">[IMG]</span>
       </div>
 
       {/* Product Info */}

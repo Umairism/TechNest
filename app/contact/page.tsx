@@ -51,7 +51,7 @@ export default function ContactPage() {
               {
                 icon: Phone,
                 title: "Phone",
-                content: "+1 (555) 123-4567",
+                content: "+923329981207",
                 label: "Available 24/7",
               },
               {
@@ -63,7 +63,7 @@ export default function ContactPage() {
               {
                 icon: MapPin,
                 title: "Address",
-                content: "123 Tech Street, San Francisco, CA 94102",
+                content: "G11/3, Islamabad",
                 label: "Visit our showroom",
               },
             ].map((item) => {

@@ -32,7 +32,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="bg-gradient-to-br from-secondary to-muted rounded-lg p-12 flex items-center justify-center">
-              <span className="text-8xl">🏢</span>
+              <span className="text-8xl">●</span>
             </div>
           </div>
         </div>
@@ -48,18 +48,18 @@ export default function AboutPage() {
                 title: "Quality First",
                 description:
                   "We only stock products from trusted manufacturers known for excellence",
-                icon: "⭐",
+                icon: "★",
               },
               {
                 title: "Customer Focus",
                 description:
                   "Your satisfaction is our top priority with dedicated 24/7 support",
-                icon: "💪",
+                icon: "✓",
               },
               {
                 title: "Competitive Pricing",
                 description: "Best prices in the market without compromising quality",
-                icon: "💰",
+                icon: "◆",
               },
             ].map((value) => (
               <div key={value.title} className="bg-card border border-border rounded-lg p-8">

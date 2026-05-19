@@ -15,33 +15,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Invalid credentials");
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
+
+          if (!user || !user.password) {
+            throw new Error("Invalid credentials");
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            throw new Error("Invalid credentials");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("[Auth] Authorization error:", error);
+          throw new Error("Authorization failed");
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
-
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials");
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          throw new Error("Invalid credentials");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       },
     }),
 
@@ -62,23 +67,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as any).role || "customer";
+      try {
+        if (user) {
+          token.id = user.id;
+          token.role = (user as any).role || "customer";
+        }
+      } catch (error) {
+        console.error("[Auth] JWT callback error:", error);
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+      try {
+        if (session.user) {
+          (session.user as any).id = token.id;
+          (session.user as any).role = token.role;
+        }
+      } catch (error) {
+        console.error("[Auth] Session callback error:", error);
       }
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect to home after login
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      else if (new URL(url).origin === baseUrl) return url;
+      try {
+        // Redirect to home after login
+        if (url.startsWith("/")) return `${baseUrl}${url}`;
+        else if (new URL(url).origin === baseUrl) return url;
+      } catch (error) {
+        console.error("[Auth] Redirect error:", error);
+      }
       return baseUrl;
     },
   },
@@ -95,12 +112,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   events: {
     async signIn({ user }) {
-      console.log(`[Auth] User signed in: ${user.email}`);
+      try {
+        console.log(`[Auth] User signed in: ${user.email}`);
+      } catch (error) {
+        console.error("[Auth] SignIn event error:", error);
+      }
     },
     async signOut() {
-      console.log("[Auth] User signed out");
+      try {
+        console.log("[Auth] User signed out");
+      } catch (error) {
+        console.error("[Auth] SignOut event error:", error);
+      }
     },
   },
 
+  trustHost: true,
   debug: process.env.DEBUG === "true",
 });

@@ -1,177 +1,111 @@
-# TechNest E-Commerce Platform - Deployment Guide
+# TechNest Deployment Guide
 
-## Pre-Deployment Checklist
+## Recommended Netlify Deployment
 
-### Code Quality
-- [ ] `npm run build` passes without errors
-- [ ] No console warnings or errors in browser
-- [ ] All TypeScript errors resolved
-- [ ] Code follows project conventions
+This project uses Next.js route handlers, Auth.js, Prisma, PostgreSQL, checkout APIs, and admin server pages. That means it is not a pure static export. Deploy it to Netlify as a Next.js app so Netlify can provision serverless functions for APIs and server-rendered pages.
 
-### Performance
-- [ ] Lighthouse score >90 on home page
-- [ ] Cumulative Layout Shift (CLS) < 0.1
-- [ ] Largest Contentful Paint (LCP) < 2.5s
-- [ ] All images are optimized
-- [ ] All components use React.memo where needed
+Netlify settings:
 
-### Functionality
-- [ ] Cart add/remove/update works
-- [ ] Cart persists after page reload
-- [ ] Checkout form validation works
-- [ ] Product filtering and sorting works
-- [ ] Product search works
-- [ ] Mobile layout responsive on all pages
-- [ ] Navigation links work
-- [ ] No broken images or 404s
+- Build command: `npm run build:netlify`
+- Publish directory: `.next`
+- Node version: `22`
 
-### SEO
-- [ ] All pages have proper metadata
-- [ ] robots.txt exists
-- [ ] sitemap.xml generates correctly
-- [ ] Product pages have structured data
-- [ ] Open Graph meta tags present
+The `netlify.toml` file already sets these values.
 
-### Browser Compatibility
-- [ ] Tested on Chrome/Edge
-- [ ] Tested on Firefox
-- [ ] Tested on Safari
-- [ ] Mobile Safari (iOS)
-- [ ] Chrome Mobile (Android)
+## Required Environment Variables
 
-## Deployment Steps
+Set these in Netlify: Site settings -> Build & deploy -> Environment variables.
 
-### Option 1: Deploy via GitHub (Recommended)
-
-1. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Production: refactored to production-grade architecture"
-   git push origin main
-   ```
-
-2. **Connect to Vercel**
-   - Go to https://vercel.com/import
-   - Select your repository
-   - Click "Import"
-
-3. **Configure Environment Variables**
-   - Add `NEXT_PUBLIC_SITE_URL`
-   - Add `NEXT_PUBLIC_API_URL`
-   - Click "Deploy"
-
-### Option 2: Deploy via Vercel CLI
-
-1. **Install Vercel CLI**
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Authenticate**
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy**
-   ```bash
-   vercel --prod
-   ```
-
-4. **Set Environment Variables**
-   ```bash
-   vercel env add NEXT_PUBLIC_SITE_URL
-   vercel env add NEXT_PUBLIC_API_URL
-   ```
-
-## Post-Deployment Verification
-
-### Test Deployed Site
-1. Visit your Vercel deployment URL
-2. Test all key functionality:
-   - Add product to cart
-   - Remove from cart
-   - Update quantity
-   - Go to checkout
-   - Test filters and search
-   - Check mobile responsiveness
-
-### Monitor Performance
-1. **Vercel Analytics**
-   - Check Web Vitals dashboard
-   - Monitor real user metrics
-
-2. **Third-Party Tools**
-   - Run Lighthouse audit
-   - Test with WebPageTest
-   - Check Core Web Vitals
-
-### Monitor Errors
-1. **Vercel Error Tracking**
-   - Monitor error rate
-   - Check for console errors
-   - Review deployment logs
-
-## Environment Variables
-
-Create `.env.local` for local development:
-```
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB?sslmode=require"
+NEXTAUTH_URL="https://your-site.netlify.app"
+AUTH_URL="https://your-site.netlify.app"
+NEXTAUTH_SECRET="generate-a-long-random-secret"
+AUTH_SECRET="same-as-nextauth-secret"
+NEXT_PUBLIC_SITE_URL="https://your-site.netlify.app"
+NEXT_PUBLIC_SITE_NAME="TechNest"
+JWT_SECRET="generate-a-different-long-random-secret"
+JWT_EXPIRATION="7d"
+RATE_LIMIT_WINDOW_MS="900000"
+RATE_LIMIT_MAX_REQUESTS="100"
 ```
 
-For production, set in Vercel dashboard:
+Optional, only if enabled:
+
+```bash
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+GITHUB_ID=""
+GITHUB_SECRET=""
+JAZZCASH_MERCHANT_ID=""
+JAZZCASH_PASSWORD=""
+EASYPAISA_STORE_ID=""
+EASYPAISA_MERCHANT_ID=""
+EASYPAISA_PASSWORD=""
 ```
-NEXT_PUBLIC_SITE_URL=https://technest.vercel.app
-NEXT_PUBLIC_API_URL=https://technest.vercel.app/api
+
+Generate secrets locally:
+
+```bash
+openssl rand -hex 32
 ```
 
-## Build Optimization
+On Windows PowerShell:
 
-The project is configured for production with:
-- SWC minification enabled
-- Image optimization with AVIF/WebP
-- React Strict Mode for development debugging
-- Source maps disabled in production
-- Automatic static optimization
+```powershell
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-## Rollback Plan
+## Database
 
-If deployment issues occur:
+Use a hosted PostgreSQL database. Good options:
 
-1. **Via Vercel Dashboard**
-   - Go to Deployments
-   - Select previous stable deployment
-   - Click "Promote to Production"
+- Neon
+- Supabase
+- Railway
+- Prisma Postgres
+- Netlify Database, if available in your Netlify account
 
-2. **Via Git**
-   ```bash
-   git revert <commit-hash>
-   git push origin main
-   ```
+For serverless deployments, prefer pooled PostgreSQL URLs. Serverless functions can open many short-lived connections, so connection pooling matters.
 
-## Production Tips
+After setting `DATABASE_URL`, run one of these:
 
-1. **Monitor Lighthouse Regularly**
-   - Run monthly performance audits
-   - Target: LCP < 2.5s, CLS < 0.1
+```bash
+npx prisma db push
+npm run prisma:seed
+```
 
-2. **Monitor Core Web Vitals**
-   - Use Vercel Analytics
-   - Set up alerts for regressions
+For production teams, use migrations instead:
 
-3. **Update Dependencies**
-   - Review monthly
-   - Update patch versions immediately
-   - Test major updates before deploying
+```bash
+npx prisma migrate deploy
+```
 
-4. **Backup Strategy**
-   - All code in Git (version controlled)
-   - Vercel keeps deployment history
-   - Can rollback anytime
+## Deploy Steps
 
-## Support
+1. Push the repository to GitHub.
+2. In Netlify, choose Add new site -> Import existing project.
+3. Select the GitHub repository.
+4. Confirm build command is `npm run build:netlify`.
+5. Confirm publish directory is `.next`.
+6. Add environment variables.
+7. Deploy.
+8. Open `/admin/login` and sign in with the seeded admin user.
 
-For Vercel deployment issues:
-- Check https://vercel.com/help
-- Review https://nextjs.org/docs
-- Contact Vercel support
+## Static Frontend Only Option
+
+A true static Netlify frontend cannot run this app's backend features. Static export does not support dynamic server behavior such as cookies, auth sessions, POST route handlers, Prisma queries, server actions, or admin pages that read the database.
+
+If you want Netlify to host only static files:
+
+1. Move all backend code to a separate service:
+   - Railway/Render/Fly.io Node API
+   - NestJS/Express API
+   - Supabase direct APIs
+   - Netlify Functions with a separate `/netlify/functions` backend
+2. Replace frontend calls like `/api/products` with `NEXT_PUBLIC_API_URL`.
+3. Convert server-rendered admin pages to client pages that call the external API.
+4. Remove Auth.js server session dependency from static pages, or use a frontend-compatible auth provider.
+5. Only then set `output: "export"` in `next.config.mjs` and publish `out`.
+
+For this repository today, the safest production path is Netlify's Next.js runtime, not static export.

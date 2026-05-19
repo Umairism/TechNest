@@ -248,7 +248,7 @@ export class PaymentService {
   private static async verifyJazzCashCallback(data: any) {
     const reference = data.pp_TxnRefNo;
 
-    const payment = await prisma.payment.findUnique({
+    const payment = await prisma.payment.findFirst({
       where: { reference },
     });
 
@@ -287,7 +287,7 @@ export class PaymentService {
   private static async verifyEasypaisaCallback(data: any) {
     const reference = data.txnrefno;
 
-    const payment = await prisma.payment.findUnique({
+    const payment = await prisma.payment.findFirst({
       where: { reference },
     });
 

@@ -211,6 +211,24 @@ export class InventoryService {
   }
 
   /**
+   * Get all product inventory rows for admin tables
+   */
+  static async getAllProducts() {
+    return await prisma.inventory.findMany({
+      include: {
+        product: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        lastUpdated: "desc",
+      },
+    });
+  }
+
+  /**
    * Bulk update inventory (admin)
    */
   static async bulkUpdateInventory(

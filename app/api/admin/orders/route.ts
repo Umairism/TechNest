@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { OrderStatus, PaymentStatus } from "@prisma/client";
+
+type OrderStatusValue =
+  | "pending"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "refunded";
+
+type PaymentStatusValue = "unpaid" | "paid" | "failed" | "refunded";
 
 /**
  * GET /api/admin/orders
@@ -92,8 +102,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updateData: any = {};
-    if (status) updateData.status = status as OrderStatus;
-    if (paymentStatus) updateData.paymentStatus = paymentStatus as PaymentStatus;
+    if (status) updateData.status = status as OrderStatusValue;
+    if (paymentStatus) updateData.paymentStatus = paymentStatus as PaymentStatusValue;
     if (trackingId) updateData.trackingId = trackingId;
     if (notes) updateData.notes = notes;
 

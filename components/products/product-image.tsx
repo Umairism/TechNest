@@ -10,7 +10,7 @@ interface ProductImageProps {
 }
 
 export const ProductImage = React.memo(function ProductImage({
-  emoji = "📦",
+  emoji = "[IMG]",
   alt = "Product image",
   className = "relative w-full aspect-square bg-secondary overflow-hidden",
   imageClassName = "w-full h-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300",
